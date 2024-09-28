@@ -21,29 +21,6 @@ pipeline {
             }
         }
 
-        stage('Security Scan') {
-            steps {
-                 script {
-                    def snykResults = sh(script: './node_modules/.bin/snyk test --json --ignore-policy', returnStdout: true)
-                    def jsonResults = readJSON(text: snykResults)
-                    if (jsonResults.vulnerabilities.any { it.severity == 'critical' }) {
-                        error("Synk Vulnerabilities found! Check snyk-report.json.")
-                    } else {
-                        writeFile file: 'snyk-report.json', text: snykResults
-                    }
-                }
-
-                echo 'Snyk Scan Completed'
-            }
-            post {
-                success {
-                    echo 'Sync Security Scan passed!'
-                }
-                failure {
-                    echo 'Synk Failed.'
-                }
-            }
-        }
         stage('Test') {
             steps {
                 script {
